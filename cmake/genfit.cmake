@@ -1,5 +1,11 @@
 MACRO( ADD_GENFIT_TEST _testname )
-    ADD_EXECUTABLE( ${_testname} EXCLUDE_FROM_ALL ${ARGN} )
+    # If we have tests enabled build all tests directly, otherwise build them
+    # only via the tests target
+    IF(BUILD_TESTING)
+      ADD_EXECUTABLE( ${_testname} ${ARGN} )
+    ELSE()
+      ADD_EXECUTABLE( ${_testname} EXCLUDE_FROM_ALL ${ARGN} )
+    ENDIF()
     ADD_DEPENDENCIES( tests  ${_testname} )
     TARGET_LINK_LIBRARIES( ${_testname} ${PROJECT_NAME}  ${ROOT_LIBS} -lGeom )
     #INSTALL( TARGETS ${_testname} DESTINATION ${EXECUTABLE_INSTALL_DIR})
@@ -10,7 +16,6 @@ MACRO (ROOT_GENERATE_DICTIONARY LIBNAME INFILES INCLUDE_DIRS_IN LINKDEF_FILE OUT
     FOREACH (_current_FILE ${INCLUDE_DIRS_IN})
         set(INCLUDE_DIRS ${INCLUDE_DIRS} -I${_current_FILE})
     ENDFOREACH (_current_FILE ${INCLUDE_DIRS_IN})
-    SET(INCLUDE_DIRS ${INCLUDE_DIRS} -I${EIGEN3_INCLUDE_DIR})
 
     SET(EXTRA_DICT_ARGS "")
     STRING(REGEX REPLACE "^(.*)\\.(.*)$" "\\1_rdict.pcm" OUTFILE_PCM "${OUTFILE}")

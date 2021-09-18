@@ -35,8 +35,8 @@ FIND_PACKAGE(ROOT REQUIRED COMPONENTS Geom)
 IF(${ROOT_found_version} LESS 60000)
 	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.00.00")
 ENDIF()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
 
-FIND_PACKAGE(Eigen3 REQUIRED)
 
 # either, the environment variable RAVEPATH has to be specified, and RAVE's RaveConfig.cmake will be used to determine everything we need
 # or, Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS have to be set via the command-line
@@ -99,8 +99,7 @@ IF(NOT CMAKE_BUILD_TYPE)
       FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
-SET(CPP_STANDARD c++11)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=${CPP_STANDARD} -pthread -Wpedantic -Wall -Wextra \
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wpedantic -Wall -Wextra \
  -Wno-long-long -Wshadow -Werror=overloaded-virtual -Wunused-parameter -Waddress")
 
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g")
@@ -307,6 +306,7 @@ else()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ROOT_LIBS})
 endif()
 
+INCLUDE(CTest)
 
 ADD_CUSTOM_TARGET( tests )
 
@@ -321,24 +321,33 @@ IF(DEFINED RAVE)
   ADD_GENFIT_TEST( vertexingTestRead       test/vertexingTest/read.cc)
 ENDIF()
 
+IF(BUILD_TESTING)
 
-FIND_PACKAGE(GTest)
-IF(GTEST_FOUND)
+	# Run these automatically via ctest since they do not need a GUI. Create the
+	# necessary geometry first via a dummy test
+	ADD_TEST(NAME createGeometry COMMAND root -l -b -q ${CMAKE_CURRENT_LIST_DIR}/test/makeGeom.C)
+
+	ADD_TEST(NAME streamerTest COMMAND streamerTest)
+	SET_PROPERTY(TEST streamerTest PROPERTY DEPENDS createGeometry)
+
+	ADD_TEST(NAME unitTests COMMAND unitTests)
+	SET_PROPERTY(TEST unitTests PROPERTY DEPENDS createGeometry)
+
+    ENABLE_TESTING()
+
+
+	FIND_PACKAGE(GTest REQUIRED)
 	ADD_EXECUTABLE(gtests
 			gtest/TestConstField.cpp
 			gtest/TestMaterialEffects.cpp
 			gtest/TestRKTrackRep.cpp
-			gtest/TestRootEigenTransformations.cpp
-			gtest/TestRKMatrixEigenTransformations.cpp
-			gtest/TestUnits.cpp
 			gtest/TestMaterial.cpp
 			)
 	TARGET_LINK_LIBRARIES(gtests ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBS} ${PROJECT_NAME})  # gtest gtest_main
 	MESSAGE(STATUS  ${GTEST_INCLUDE_DIRS})
 	TARGET_INCLUDE_DIRECTORIES(gtests PUBLIC ${GTEST_INCLUDE_DIRS})
+	GTEST_DISCOVER_TESTS(gtests)
 	INSTALL(TARGETS gtests DESTINATION bin)
-ELSE()
-	MESSAGE(STATUS "GTest not installed or found -- skip building unittests.")
 ENDIF()
 
 # generate and install following configuration files

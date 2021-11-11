@@ -1,4 +1,5 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+CMAKE_MINIMUM_REQUIRED(VERSION 3.17)
+
 if(POLICY CMP0042)
    # policies not known to CMake 2.8 ...
    cmake_policy(SET CMP0042 NEW) # Mac OS -rpath behavior
@@ -7,10 +8,36 @@ endif(POLICY CMP0042)
 # declare the project name
 PROJECT(genfit2)
 
+# SPW Additions
+set(CMAKE_BUILD_TYPE "RelWithDebInfo")  #Options: Release, MinSizeRel, Debug, RelWithDebInfo (def)
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3") #force Release to use -O3, not -O2
+set(CMAKE_CXX_STANDARD 17)              # Select a modern c++ standard
+
+# Attempt to search for ROOT in /cern if ROOTSYS isn't defined, which could happen in some odd IDE environments.
+if(DEFINED ENV{ROOTSYS})
+    message("Found ROOTSYS at $ENV{ROOTSYS}")
+    #list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}) # enable searches your defined path.  Probably not needed.
+else()
+    message("ROOTSYS not found.  Searching in /cern.")
+    message("  => This will match the first ROOT install it finds, which might not be what you want!")
+    list(APPEND CMAKE_PREFIX_PATH /cern)     # enable searches in old-school cern paths
+endif()
+find_package(ROOT REQUIRED)
+
+message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
+message("${BWhite}      compiler : ${BCyan}${CMAKE_CXX_COMPILER_ID} v${CMAKE_CXX_COMPILER_VERSION}${ColReset}")
+message("${BWhite}      standard : ${BCyan}c++${CMAKE_CXX_STANDARD}${ColReset}")
+message("${BWhite}          ROOT : ${BCyan}v${ROOT_VERSION}${ColReset}")
+message("${BWhite}          Type : ${BCyan}${CMAKE_BUILD_TYPE}${ColReset}")
+message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
+message("")
+# END SPW Changes
+
+
 # set project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 2 )
 SET( ${PROJECT_NAME}_VERSION_MINOR 2 )
-SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
+SET( ${PROJECT_NAME}_VERSION_PATCH 0spw )
 
 include(GNUInstallDirs)
 
@@ -33,14 +60,12 @@ INCLUDE(genfit)
 
 FIND_PACKAGE(ROOT REQUIRED COMPONENTS Geom)
 IF(${ROOT_found_version} LESS 60000)
-	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.00.00")
+	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.00.00.  Found ${ROOT_found_version}")
 ENDIF()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
 
-
 # either, the environment variable RAVEPATH has to be specified, and RAVE's RaveConfig.cmake will be used to determine everything we need
 # or, Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS have to be set via the command-line
-
 
 IF(DEFINED ENV{RAVEPATH})
 	MESSAGE(STATUS "Environment variable RAVEPATH is set. Try to build GFRave.")

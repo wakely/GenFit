@@ -9,19 +9,6 @@ endif(POLICY CMP0042)
 PROJECT(genfit2)
 
 # SPW Additions
-set(CMAKE_BUILD_TYPE "RelWithDebInfo")  #Options: Release, MinSizeRel, Debug, RelWithDebInfo (def)
-#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3") #force Release to use -O3, not -O2
-set(CMAKE_CXX_STANDARD 17)              # Select a modern c++ standard
-
-# Attempt to search for ROOT in /cern if ROOTSYS isn't defined, which could happen in some odd IDE environments.
-if(DEFINED ENV{ROOTSYS})
-    message("Found ROOTSYS at $ENV{ROOTSYS}")
-    #list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}) # enable searches your defined path.  Probably not needed.
-else()
-    message("ROOTSYS not found.  Searching in /cern.")
-    message("  => This will match the first ROOT install it finds, which might not be what you want!")
-    list(APPEND CMAKE_PREFIX_PATH /cern)     # enable searches in old-school cern paths
-endif()
 find_package(ROOT REQUIRED)
 
 message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
@@ -33,11 +20,11 @@ message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
 message("")
 # END SPW Changes
 
-
-# set project version
+# set project version:
+# NB: this does not seem to be updated by the GenFit maintainers to match their actual release versions
 SET( ${PROJECT_NAME}_VERSION_MAJOR 2 )
-SET( ${PROJECT_NAME}_VERSION_MINOR 2 )
-SET( ${PROJECT_NAME}_VERSION_PATCH 0spw )
+SET( ${PROJECT_NAME}_VERSION_MINOR 0 )
+SET( ${PROJECT_NAME}_VERSION_PATCH 2-hlx )
 
 include(GNUInstallDirs)
 

@@ -304,6 +304,8 @@ endif()
 
 # install
 ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources})
+# SPW addition - needed for the target to expose header dirs.
+target_include_directories(${PROJECT_NAME} PUBLIC ${GF_INC_DIRS})
 INSTALL(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 # link ROOT libraries

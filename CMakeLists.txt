@@ -1,4 +1,5 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+CMAKE_MINIMUM_REQUIRED(VERSION 3.17)
+
 if(POLICY CMP0042)
    # policies not known to CMake 2.8 ...
    cmake_policy(SET CMP0042 NEW) # Mac OS -rpath behavior
@@ -7,10 +8,21 @@ endif(POLICY CMP0042)
 # declare the project name
 PROJECT(genfit2)
 
-# set project version
+# SPW Additions
+message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
+message("${BWhite}      compiler : ${BCyan}${CMAKE_CXX_COMPILER_ID} v${CMAKE_CXX_COMPILER_VERSION}${ColReset}")
+message("${BWhite}      standard : ${BCyan}c++${CMAKE_CXX_STANDARD}${ColReset}")
+message("${BWhite}          ROOT : ${BCyan}v${ROOT_VERSION}${ColReset}")
+message("${BWhite}          Type : ${BCyan}${CMAKE_BUILD_TYPE}${ColReset}")
+message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
+message("")
+
+
+# set project version:
+# NB: this does not seem to be updated by the GenFit maintainers to match their actual release versions
 SET( ${PROJECT_NAME}_VERSION_MAJOR 2 )
-SET( ${PROJECT_NAME}_VERSION_MINOR 2 )
-SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
+SET( ${PROJECT_NAME}_VERSION_MINOR 0 )
+SET( ${PROJECT_NAME}_VERSION_PATCH 5-hlx )
 
 include(GNUInstallDirs)
 

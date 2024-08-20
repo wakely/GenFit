@@ -8,7 +8,7 @@ endif(POLICY CMP0042)
 # declare the project name
 PROJECT(genfit2)
 
-# SPW Additions
+# SPW Mods
 message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
 message("${BWhite}      compiler : ${BCyan}${CMAKE_CXX_COMPILER_ID} v${CMAKE_CXX_COMPILER_VERSION}${ColReset}")
 message("${BWhite}      standard : ${BCyan}c++${CMAKE_CXX_STANDARD}${ColReset}")
@@ -17,12 +17,12 @@ message("${BWhite}          Type : ${BCyan}${CMAKE_BUILD_TYPE}${ColReset}")
 message("${BYellow}-- Current ${PROJECT_NAME} Environment --${ColReset}")
 message("")
 
-
 # set project version:
 # NB: this does not seem to be updated by the GenFit maintainers to match their actual release versions
 SET( ${PROJECT_NAME}_VERSION_MAJOR 2 )
 SET( ${PROJECT_NAME}_VERSION_MINOR 0 )
 SET( ${PROJECT_NAME}_VERSION_PATCH 5-hlx )
+# End SPW Mods
 
 include(GNUInstallDirs)
 
@@ -284,6 +284,11 @@ endif()
 # install
 ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources})
 INSTALL(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+
+#SPW Mods
+target_include_directories(${PROJECT_NAME} PUBLIC ${GF_INC_DIRS})
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+#End SPW Mods
 
 # link ROOT libraries
 if(DEFINED RAVE)
